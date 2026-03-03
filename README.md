@@ -122,5 +122,62 @@ celery -A app.workers.celery_app flower --port=5555
 
 ---
 
+## 📈 Scaling Plan & Performance Engineering
+
+To handle production-level traffic (1,000+ PDFs/hour), the system follows a horizontal scaling strategy:
+
+1.  **Worker Auto-scaling:** Celery workers can be scaled independently of the API layer. Using a Kubernetes HPA (Horizontal Pod Autoscaler), we can scale worker replicas based on Redis queue length or CPU/Memory usage.
+2.  **Database Strategy:** Transition from a single PostgreSQL instance to a managed RDS with **PgBouncer** for efficient connection pooling. Read-replicas can be introduced to offload analytical queries.
+3.  **API Layer:** Run multiple Uvicorn instances behind an Nginx or ALB load balancer. Use `Gunicorn` with `UvicornWorker` for better process management.
+4.  **Redis Cluster:** For high-throughput task brokering and caching, migrate to a Redis Cluster or a managed service like AWS ElastiCache.
+5.  **Multi-Model Orchestration:** Distribute LLM requests across multiple API keys or providers (Groq, Gemini, OpenAI) to bypass individual rate limits.
+
+### 🔍 Identified Bottlenecks
+*   **LLM API Rate Limits:** The primary bottleneck is the TPM (Tokens Per Minute) and RPM (Requests Per Minute) limits enforced by free-tier LLM providers like Groq and Gemini.
+*   **PDF Parsing (CPU-Bound):** Extracting text from heavy, image-rich, or 50MB+ PDFs consumes significant CPU time, potentially starving worker threads.
+*   **Sequential Agent Execution:** CrewAI currently processes the Analyzer → Composer → Delivery steps sequentially, blocking the worker for the entire 3-step duration instead of yielding.
+
+### 🚀 Behavior at 10x Load
+Under a simulated 10x load spike:
+1.  **API Resilience:** The FastAPI layer will remain responsive, accepting files asynchronously, saving them to disk (or S3), and rapidly enqueueing Jobs in Redis without blocking.
+2.  **Queue Backpressure:** Redis will buffer the sudden influx of tasks. Celery workers will continue pulling tasks at their maximum concurrency (`CELERY_CONCURRENCY`). Job states will correctly remain `PENDING` until a worker is free.
+3.  **Rate Limit Exhaustion:** As workers hit LLM providers concurrently, 429 Too Many Requests errors will trigger. The system's exponential backoff will automatically re-queue the tasks, effectively spreading the workload over a longer duration.
+
+### ⚖️ Trade-offs Made
+*   **Pessimistic vs. Optimistic Locking:** Chose pessimistic locking (`SELECT FOR UPDATE`) for job state transitions to guarantee safety over slightly higher throughput, given the low write-volume of state changes relative to the long processing time of LLMs.
+*   **Sequential vs. Parallel Agents:** Kept agent orchestration sequential to prevent circular hallucination and guarantee deterministic data flow from Analyzer to Composer, at the cost of higher latency per job.
+*   **Disk Storage vs. Memory:** PDFs are saved to disk (`./uploads`) and streamed during processing rather than kept in RAM, trading disk I/O latency for improved memory stability under concurrent load.
+
+---
+
+## ⚠️ Known Limitations
+
+*   **File Size:** Maximum PDF upload size is capped at **50MB** (configurable in `.env`).
+*   **LLM Context Window:** Long PDFs (>100 pages) may exceed the context window of Llama3 or Gemini. Large documents are currently chunked, but summary coherence may vary.
+*   **Rate Limiting:** Free-tier API keys (Groq/Gemini) have strict rate limits (RPM/TPM). High-concurrency jobs may trigger 429 errors.
+*   **SMTP Constraints:** Single-sender SMTP accounts (e.g., Gmail) may flag high-volume automated emails as spam.
+*   **Sequential Processing:** CrewAI's current configuration is sequential; parallel agent execution is not yet implemented for single-job tasks.
+
+---
+
+## 📄 Sample PDF & Testing
+
+The repository includes a script to generate a standard business report for testing the end-to-end pipeline.
+
+### Generate Sample
+```bash
+# Ensure reportlab is installed
+pip install reportlab
+# Generate the PDF
+python sample/generate_sample.py
+```
+This creates `sample/sample_report.pdf` which contains financial data and contact emails suitable for the Analyzer and Composer agents.
+
+### Expected Output
+See `sample/expected_output.json` for the structure of the JSON response after the agents finish processing.
+
+---
+
 Built with ❤️ by **Rahul**  
 📧 [rahulsagar280103@gmail.com](mailto:rahulsagar280103@gmail.com)
+
