@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.api.routes import auth, documents, health, jobs
 from app.core.config import settings
@@ -77,6 +77,10 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
 # ── Routers ────────────────────────────────────────────────────────────────────
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    return RedirectResponse(url="/docs")
+
 app.include_router(health.router)
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(documents.router, prefix="/api/v1")
