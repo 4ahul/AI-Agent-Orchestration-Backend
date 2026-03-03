@@ -1,0 +1,38 @@
+{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "document_id": "660e8400-e29b-41d4-a716-446655441111",
+  "status": "COMPLETED",
+  "pipeline": {
+    "pdf_analyzer_output": {
+      "title": "Quarterly Business Report Q1 2024",
+      "summary": "This report covers Global AI Solutions' Q1 2024 performance, including revenue growth of 42%, expansion into 3 new markets, and the successful launch of 2 AI-powered products. Key challenges include rising infrastructure costs and talent acquisition. The company projects continued growth into Q2.",
+      "key_entities": {
+        "emails": ["finance@globalaisolutions.ai"],
+        "proper_nouns": ["Global AI Solutions", "Mumbai", "Bangalore", "Singapore"],
+        "dates": ["Q1 2024", "March 2024", "April 2024"]
+      },
+      "sections": [
+        {"title": "Executive Summary", "page": 1},
+        {"title": "Financial Performance", "page": 2},
+        {"title": "Market Expansion", "page": 4},
+        {"title": "Product Updates", "page": 6},
+        {"title": "Outlook Q2 2024", "page": 8}
+      ]
+    },
+    "email_composer_output": {
+      "subject": "Analysis Report: Quarterly Business Report Q1 2024",
+      "body": "Dear Recipient,\n\nI hope this email finds you well.\n\nI am writing to share the analysis of the document titled \"Quarterly Business Report Q1 2024\".\n\n--- Document Summary ---\nThis report covers Global AI Solutions' Q1 2024 performance, including revenue growth of 42%, expansion into 3 new markets, and the successful launch of 2 AI-powered products.\n\n--- Key Entities Identified ---\nOrganizations: Global AI Solutions\nLocations: Mumbai, Bangalore, Singapore\n\nBest regards,\nAI Agent Orchestrator"
+    },
+    "email_delivery_output": {
+      "success": true,
+      "message_id": "smtp-recipient@example.com-Analysis Report",
+      "recipient": "recipient@example.com",
+      "provider_response": {"refused": {}}
+    }
+  },
+  "execution_logs": [
+    {"level": "INFO", "step": "task.start", "message": "Processing started for job 550e8400..."},
+    {"level": "INFO", "step": "crew.start", "message": "CrewAI pipeline initiated"},
+    {"level": "INFO", "step": "task.complete", "message": "Job completed successfully"}
+  ]
+}

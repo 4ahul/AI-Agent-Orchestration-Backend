@@ -1,0 +1,65 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568" />
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f7fafc" />
+  
+  <!-- API Layer -->
+  <rect x="300" y="20" width="200" height="60" rx="8" fill="#4299e1" />
+  <text x="400" y="55" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">API Layer (FastAPI)</text>
+  
+  <!-- Auth/JWT -->
+  <rect x="520" y="25" width="100" height="50" rx="4" fill="#63b3ed" />
+  <text x="570" y="55" font-family="Arial" font-size="12" fill="white" text-anchor="middle">JWT Auth</text>
+  
+  <!-- Flow to Services -->
+  <line x1="400" y1="80" x2="400" y2="110" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Service Layer -->
+  <rect x="250" y="120" width="300" height="80" rx="8" fill="#48bb78" />
+  <text x="400" y="150" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Service Layer</text>
+  <text x="400" y="175" font-family="Arial" font-size="12" fill="white" text-anchor="middle">PDF Processing | Email Logic</text>
+  
+  <!-- Flow to Broker -->
+  <line x1="400" y1="200" x2="400" y2="230" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Redis Broker -->
+  <rect x="325" y="240" width="150" height="60" rx="20" fill="#f56565" />
+  <text x="400" y="275" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Redis (Queue)</text>
+  
+  <!-- Flow to Worker -->
+  <line x1="400" y1="300" x2="400" y2="330" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Worker Layer -->
+  <rect x="200" y="340" width="400" height="120" rx="8" fill="#ed8936" />
+  <text x="400" y="370" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">Background Tasks (Celery)</text>
+  
+  <!-- Agents inside Worker -->
+  <rect x="220" y="390" width="100" height="50" rx="4" fill="#f6ad55" />
+  <text x="270" y="420" font-family="Arial" font-size="12" fill="white" text-anchor="middle">PDF Agent</text>
+  
+  <rect x="350" y="390" width="100" height="50" rx="4" fill="#f6ad55" />
+  <text x="400" y="420" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Email Agent</text>
+  
+  <rect x="480" y="390" width="100" height="50" rx="4" fill="#f6ad55" />
+  <text x="530" y="420" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Delivery Agent</text>
+  
+  <!-- Flow to Persistence and Providers -->
+  <line x1="300" y1="460" x2="200" y2="510" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)" />
+  <line x1="500" y1="460" x2="600" y2="510" stroke="#4a5568" stroke-width="2" marker-end="url(#arrowhead)" />
+  
+  <!-- Persistence -->
+  <rect x="50" y="520" width="250" height="60" rx="8" fill="#805ad5" />
+  <text x="175" y="555" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">PostgreSQL (Database)</text>
+  
+  <!-- External -->
+  <rect x="500" y="520" width="250" height="60" rx="8" fill="#718096" />
+  <text x="625" y="555" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">LLM &amp; Email Providers</text>
+  
+  <!-- Legend/Labels -->
+  <text x="10" y="20" font-family="Arial" font-size="10" fill="#a0aec0">AI Agent Orchestration - System Architecture</text>
+</svg>

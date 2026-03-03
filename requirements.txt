@@ -1,0 +1,63 @@
+# Core Framework
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+
+# AI / Agent Orchestration (Pinned Golden Set)
+crewai==0.36.0
+langchain==0.2.1
+langchain-community==0.2.1
+langchain-core==0.2.2
+langchain-groq==0.1.4
+langchain-google-genai==1.0.6
+google-generativeai==0.5.4
+langchain-google-vertexai==1.0.5
+openai==1.30.1
+
+# PDF Processing
+pdfplumber==0.11.0
+pymupdf==1.24.3
+pypdf2==3.0.1
+pillow==10.3.0
+reportlab==4.2.0
+
+# Database
+sqlalchemy==2.0.31
+asyncpg==0.29.0
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# Redis & Celery
+redis==5.0.4
+celery==5.4.0
+celery[redis]==5.4.0
+flower==2.0.1
+
+# Auth & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.1
+
+# Email
+sendgrid==6.11.0
+aiosmtplib==3.0.1
+
+# HTTP Client
+httpx==0.27.0
+aiofiles==23.2.1
+
+# Validation
+pydantic==2.8.2
+pydantic-settings==2.3.4
+email-validator==2.1.1
+
+# Observability
+structlog==24.1.0
+prometheus-fastapi-instrumentator==7.0.0
+
+# Utilities
+setuptools==70.0.0
+tenacity==8.3.0
+python-ulid==2.2.0
+orjson==3.10.3
+typing-extensions==4.12.2

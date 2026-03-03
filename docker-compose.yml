@@ -1,0 +1,105 @@
+services:
+  # ─── PostgreSQL ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: agent_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis ──────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── FastAPI App ─────────────────────────────────────────────────
+  api:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── PDF Worker ──────────────────────────────────────────────────
+  worker_pdf:
+    build: .
+    restart: always
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2 -Q pdf -n worker_pdf@%h
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── Email Worker ─────────────────────────────────────────────────
+  worker_email:
+    build: .
+    restart: always
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=4 -Q email -n worker_email@%h
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # ─── Celery Beat ─────────────────────────────────────────────────
+  celery_beat:
+    build: .
+    restart: always
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - postgres
+
+  # ─── Flower ──────────────────────────────────────────────────────
+  flower:
+    build: .
+    restart: always
+    command: celery -A app.workers.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:
