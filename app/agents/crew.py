@@ -185,13 +185,18 @@ def run_agent_pipeline(
             callback=on_task_complete,
         )
 
-        # Assemble crew with strict rate limiting for Gemini Free Tier
+        # Assemble crew with strict rate limiting and disabled memory for RAM efficiency
         crew = Crew(
             agents=[pdf_analyzer, email_composer, email_delivery],
             tasks=tasks,
             process=Process.sequential,
             verbose=True,
-            max_rpm=2, # Strictly limit to 2 Requests Per Minute to save quota
+            max_rpm=2, 
+            memory=False, # Disable memory to save RAM
+            embedder={
+                "provider": "google",
+                "config": {"model": "models/embedding-001"}
+            } if settings.GOOGLE_API_KEY else None
         )
 
         crew_result = crew.kickoff()
